@@ -905,11 +905,45 @@ basePrice: {
         const residentialOptions = document.getElementById('residential-options');
         const residentialExtras = document.getElementById('residential-extras');
         const tertiaryOptions = document.getElementById('tertiary-options');
+        let currentStep = 1;
 
         // --- UI FUNCTIONS ---
 
         function scrollToSimulator() {
             document.getElementById('simulateur').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateOwnershipQuestion() {
+            const questionEl = document.getElementById('ownership-question');
+            const yesSub = document.getElementById('ownership-yes-sub');
+            const noSub = document.getElementById('ownership-no-sub');
+            if (!questionEl || !yesSub || !noSub) return;
+
+            if (state.type === 'reno') {
+                questionEl.textContent = 'Avez-vous déjà le bien ?';
+                yesSub.textContent = 'Je l’ai déjà / il est en cours d’achat.';
+                noSub.textContent = 'Je cherche encore le bien.';
+            } else if (state.type === 'tertiary') {
+                questionEl.textContent = 'Avez-vous déjà les locaux ?';
+                yesSub.textContent = 'Locaux déjà identifiés.';
+                noSub.textContent = 'Je recherche des locaux.';
+            } else {
+                questionEl.textContent = 'Avez-vous déjà le terrain ?';
+                yesSub.textContent = 'Je l’ai déjà / il est en cours d’achat.';
+                noSub.textContent = 'Je suis en recherche / je n’ai pas encore trouvé.';
+            }
+        }
+
+        function refreshOwnershipUI() {
+            document.querySelectorAll('.ownership-btn, .ownership-option').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.value === state.ownership);
+            });
+        }
+
+        function refreshTimelineUI() {
+            document.querySelectorAll('.timeline-btn, .timeline-option').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.value === state.timeline);
+            });
         }
 
         // Type Selection
@@ -940,13 +974,9 @@ basePrice: {
             if (type === 'tertiary') {
                 bathLabel.textContent = 'Nombre de sanitaires';
                 bathSub.textContent = '(WC / points d’eau)';
-                roomLabel.textContent = 'Nombre de bureaux / espaces';
-                roomSub.textContent = '(hors circulations)';
             } else {
                 bathLabel.textContent = 'Nombre de salles de bain';
                 bathSub.textContent = '(hors WC séparés)';
-                roomLabel.textContent = 'Nombre de chambres';
-                roomSub.textContent = '(hors pièces annexes)';
             }
 
             // Reset fields that depend on project type
@@ -1076,6 +1106,7 @@ basePrice: {
             // Progress Bar
             const progress = (step / 6) * 100;
             progressBar.style.width = `${progress}%`;
+            currentStep = step;
 
             if (step === 5) {
                 updateOwnershipQuestion();
