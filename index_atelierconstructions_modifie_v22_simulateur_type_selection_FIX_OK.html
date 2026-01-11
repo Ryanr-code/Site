@@ -1357,6 +1357,17 @@ bindClick('prev-step-3', () => prevStep(2));
 bindClick('calculate-btn', () => nextStep(5));
 bindClick('prev-step-4', () => prevStep(3));
 
+// Finish selection cards
+(() => {
+    document.querySelectorAll('input[name="finish"]').forEach(input => {
+        input.addEventListener('change', () => {
+            if (input.checked) {
+                selectFinish(input.value);
+            }
+        });
+    });
+})();
+
 // Step 5 -> Results
 bindClick('calculate-btn-final', () => calculateProject());
 bindClick('prev-step-5', () => prevStep(4));
