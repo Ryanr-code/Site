@@ -1313,7 +1313,7 @@ const qErr = document.getElementById('step5-error');
             const timelineLabels = { lt1: "< 1 mois", "1to3": "1 à 3 mois", gt3: "> 3 mois" };
 
             const ownLabelEl = document.getElementById('res-ownership-label');
-            if (ownLabelEl) ownEl.textContent = ownershipLabels[state.type] || "Bien / terrain";
+            if (ownLabelEl) ownLabelEl.textContent = ownershipLabels[state.type] || "Bien / terrain";
 
             const ownEl = document.getElementById('res-ownership');
             if (ownEl) ownEl.textContent = state.ownership === 'yes' ? "Oui" : "Non";
@@ -1448,7 +1448,10 @@ bindClick('next-step-3', () => nextStep(4));
 bindClick('prev-step-3', () => prevStep(2));
 
 // Step 4 -> Step 5
-bindClick('calculate-btn', () => nextStep(5));
+bindClick('calculate-btn', () => {
+    nextStep(5);
+    document.getElementById('step-5')?.scrollIntoView({ behavior: 'smooth' });
+});
 bindClick('prev-step-4', () => prevStep(3));
 
 // Bath + bedroom counters
