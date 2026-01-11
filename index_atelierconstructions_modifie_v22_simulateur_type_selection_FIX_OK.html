@@ -1591,7 +1591,7 @@ function setEmailStatus(message, kind) {
     const base = "mt-4 text-sm border px-4 py-3";
     if (kind === "success") {
         emailStatus.className = base + " border-black/10 bg-gray-50 text-black";
-        emailStatus.innerHTML = `<div class="flex items-start gap-3">
+        emailStatus.innerHTML = `<div class="flex flex-col items-center gap-3 text-center">
             <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center flex-shrink-0">
                 <i class="fa-solid fa-check text-xs"></i>
             </div>
