@@ -39,6 +39,12 @@
         /* Custom Checkbox Design */
         .option-card.selected { border-color: #111; background-color: #F9F9F7; }
         .option-card.selected .check-icon { opacity: 1; transform: scale(1); }
+
+        .ownership-option.selected,
+        .timeline-option.selected {
+            border-color: #111;
+            background-color: #F9F9F7;
+        }
         
         /* Hide scrollbar */
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -1339,6 +1345,10 @@ const bindClick = (id, fn) => {
 bindClick('next-step-2', () => nextStep(3));
 bindClick('prev-step-2', () => prevStep(1));
 
+// Header / hero CTAs
+bindClick('estimate-btn', () => scrollToSimulator());
+bindClick('start-study-btn', () => scrollToSimulator());
+
 // Step 3 -> Step 4
 bindClick('next-step-3', () => nextStep(4));
 bindClick('prev-step-3', () => prevStep(2));
@@ -1374,6 +1384,21 @@ bindClick('reset-sim', () => resetSim());
         e.preventDefault();
         selectBtn(timelineBtns, btn, 'timeline');
     }));
+})();
+
+// Options cards (checkbox + visual selection)
+(() => {
+    document.querySelectorAll('.option-check').forEach(chk => {
+        const card = chk.nextElementSibling;
+        if (card) {
+            card.classList.toggle('selected', chk.checked);
+        }
+        chk.addEventListener('change', () => {
+            if (card) {
+                card.classList.toggle('selected', chk.checked);
+            }
+        });
+    });
 })();
 
 
