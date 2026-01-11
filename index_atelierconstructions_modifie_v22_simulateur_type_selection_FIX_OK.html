@@ -603,6 +603,16 @@
                                                 <div class="w-5 h-5 border border-gray-300 rounded-full flex items-center justify-center check-icon opacity-0 transition-all bg-black text-white text-xs"><i class="fa-solid fa-check"></i></div>
                                             </div>
                                         </label>
+                                        <label class="cursor-pointer block">
+                                            <input type="checkbox" class="option-check hidden" value="insulation">
+                                            <div class="option-card border border-gray-200 p-4 flex items-center justify-between hover:border-gray-400 transition-all">
+                                                <div class="flex items-center">
+                                                    <i class="fa-solid fa-temperature-half w-8 text-gray-400"></i>
+                                                    <span class="font-serif">Isolation thermique &amp; acoustique</span>
+                                                </div>
+                                                <div class="w-5 h-5 border border-gray-300 rounded-full flex items-center justify-center check-icon opacity-0 transition-all bg-black text-white text-xs"><i class="fa-solid fa-check"></i></div>
+                                            </div>
+                                        </label>
                                     </div>
                                 </div>
 
@@ -905,6 +915,7 @@ basePrice: {
                 alarm: 2500,
                 pool: 30000,
                 garage: 25000,
+                insulation: 40,
                 // Tertiary Specific
                 network: 4000 + 15, // 4000 + 15€/m² (calculé dynamiquement)
                 acoustic: 3000 + 17, // 3000 + 17€/m² (calculé dynamiquement)
@@ -1187,9 +1198,16 @@ basePrice: {
                             poolInput.nextElementSibling.classList.remove('selected');
                             poolInput.closest('label')?.classList.add('hidden');
                         }
+                        const garageInput = document.querySelector('.option-check[value="garage"]');
+                        if (garageInput) {
+                            garageInput.checked = false;
+                            garageInput.nextElementSibling.classList.remove('selected');
+                            garageInput.closest('label')?.classList.add('hidden');
+                        }
                     } else {
                         document.querySelector('.option-check[value="pac"]')?.closest('label')?.classList.remove('hidden');
                         document.querySelector('.option-check[value="pool"]')?.closest('label')?.classList.remove('hidden');
+                        document.querySelector('.option-check[value="garage"]')?.closest('label')?.classList.remove('hidden');
                     }
                 }
             }
@@ -1273,6 +1291,9 @@ const qErr = document.getElementById('step5-error');
                 } else if(chk.value === 'acoustic') {
                     // 3000 + 17€/m²
                     optionCost = 3000 + (17 * state.surface);
+                } else if(chk.value === 'insulation') {
+                    // 40€/m²
+                    optionCost = 40 * state.surface;
                 } else {
                     // Fixed cost for other options
                     optionCost = config.options[chk.value];
