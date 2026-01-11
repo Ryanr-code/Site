@@ -754,7 +754,9 @@
                                 
                                 <div class="pt-6 border-t border-gray-200 text-left space-y-3 text-sm text-gray-600">
                                     <div class="flex justify-between"><span>Type</span> <span id="res-type" class="font-bold text-black"></span></div>
+                                    <div class="flex justify-between"><span>Bien</span> <span id="res-dwelling" class="font-bold text-black"></span></div>
                                     <div class="flex justify-between"><span>Surface</span> <span id="res-surface" class="font-bold text-black"></span></div>
+                                    <div class="flex justify-between"><span>Chambres</span> <span id="res-bedrooms" class="font-bold text-black"></span></div>
                                     <div class="flex justify-between"><span>Finition</span> <span id="res-finish" class="font-bold capitalize text-black"></span></div>
                         <div class="flex justify-between"><span id="res-ownership-label" class="text-black">Terrain / Bien</span><span id="res-ownership" class="font-bold text-black"></span></div>
                         <div class="flex justify-between"><span class="text-black">Échéance</span><span id="res-timeline" class="font-bold text-black"></span></div>
@@ -1171,6 +1173,24 @@ basePrice: {
                         c.checked = false;
                         c.nextElementSibling.classList.remove('selected');
                     });
+
+                    if (state.type === 'reno' && state.renoDwelling === 'apartment') {
+                        const pacInput = document.querySelector('.option-check[value="pac"]');
+                        if (pacInput) {
+                            pacInput.checked = false;
+                            pacInput.nextElementSibling.classList.remove('selected');
+                            pacInput.closest('label')?.classList.add('hidden');
+                        }
+                        const poolInput = document.querySelector('.option-check[value="pool"]');
+                        if (poolInput) {
+                            poolInput.checked = false;
+                            poolInput.nextElementSibling.classList.remove('selected');
+                            poolInput.closest('label')?.classList.add('hidden');
+                        }
+                    } else {
+                        document.querySelector('.option-check[value="pac"]')?.closest('label')?.classList.remove('hidden');
+                        document.querySelector('.option-check[value="pool"]')?.closest('label')?.classList.remove('hidden');
+                    }
                 }
             }
 
@@ -1296,6 +1316,15 @@ const qErr = document.getElementById('step5-error');
             
             document.getElementById('res-type').textContent = typeLabel;
             document.getElementById('res-surface').textContent = `${state.surface} m²`;
+            const dwellingLabels = { apartment: 'Appartement', house: 'Maison' };
+            const dwellingEl = document.getElementById('res-dwelling');
+            if (dwellingEl) {
+                dwellingEl.textContent = state.renoDwelling ? (dwellingLabels[state.renoDwelling] || state.renoDwelling) : '—';
+            }
+            const bedroomsEl = document.getElementById('res-bedrooms');
+            if (bedroomsEl) {
+                bedroomsEl.textContent = `${state.bedrooms}`;
+            }
             
             const finishNames = {
                 'eco': 'Essentielle',
