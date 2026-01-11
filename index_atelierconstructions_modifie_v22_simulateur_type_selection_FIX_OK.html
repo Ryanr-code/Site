@@ -41,7 +41,8 @@
         .option-card.selected .check-icon { opacity: 1; transform: scale(1); }
 
         .ownership-option.selected,
-        .timeline-option.selected {
+        .timeline-option.selected,
+        .reno-option.selected {
             border-color: #111;
             background-color: #F9F9F7;
         }
@@ -434,6 +435,25 @@
                             <h3 class="text-2xl font-serif mb-8 text-center">Dimensions & Structure</h3>
                             
                             <div class="space-y-12 max-w-2xl mx-auto">
+                                <!-- Reno Dwelling Type -->
+                                <div id="reno-dwelling-fields" class="space-y-4 hidden">
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-sm uppercase tracking-widest font-bold">Type de bien</label>
+                                        <span class="text-xs text-gray-400">Réhabilitation</span>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <button type="button" class="reno-option border border-gray-200 p-4 text-left hover:border-black transition" data-value="apartment">
+                                            <div class="font-serif text-lg">Appartement</div>
+                                            <div class="text-xs text-gray-500 mt-1">Coefficient +5%</div>
+                                        </button>
+                                        <button type="button" class="reno-option border border-gray-200 p-4 text-left hover:border-black transition" data-value="house">
+                                            <div class="font-serif text-lg">Maison</div>
+                                            <div class="text-xs text-gray-500 mt-1">Coefficient standard</div>
+                                        </button>
+                                    </div>
+                                    <p id="reno-dwelling-error" class="text-xs text-red-600 hidden">Merci de sélectionner Appartement ou Maison.</p>
+                                </div>
+
                                 <!-- Surface -->
                                 <div>
                                     <div class="flex justify-between mb-4">
@@ -441,6 +461,32 @@
                                         <span class="font-serif text-3xl"><span id="surface-display">120</span> m²</span>
                                     </div>
                                     <input type="range" id="surface-input" min="30" max="1000" value="120" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black">
+                                </div>
+
+                                <!-- Bathrooms / Sanitaires -->
+                                <div id="bathroom-fields" class="flex items-center justify-between border-b border-gray-100 pb-6">
+                                    <div>
+                                        <span class="block text-lg font-serif" id="bath-label">Salles de bain</span>
+                                        <span class="text-xs text-gray-400" id="bath-sublabel">Points d'eau complets</span>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <button id="bath-minus" class="w-8 h-8 rounded-full border border-gray-300 hover:border-black flex items-center justify-center transition-colors">-</button>
+                                        <span id="bath-count" class="font-serif text-xl w-6 text-center">1</span>
+                                        <button id="bath-plus" class="w-8 h-8 rounded-full border border-gray-300 hover:border-black flex items-center justify-center transition-colors">+</button>
+                                    </div>
+                                </div>
+
+                                <!-- Bedrooms -->
+                                <div id="bedroom-fields" class="flex items-center justify-between border-b border-gray-100 pb-6">
+                                    <div>
+                                        <span class="block text-lg font-serif" id="bedroom-label">Chambres</span>
+                                        <span class="text-xs text-gray-400" id="bedroom-sublabel">Hors pièces annexes</span>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <button id="bedroom-minus" class="w-8 h-8 rounded-full border border-gray-300 hover:border-black flex items-center justify-center transition-colors">-</button>
+                                        <span id="bedroom-count" class="font-serif text-xl w-6 text-center">2</span>
+                                        <button id="bedroom-plus" class="w-8 h-8 rounded-full border border-gray-300 hover:border-black flex items-center justify-center transition-colors">+</button>
+                                    </div>
                                 </div>
 
                                 <!-- New Construction Only Fields -->
@@ -485,19 +531,6 @@
                             <h3 class="text-2xl font-serif mb-8 text-center">Niveau de Finition</h3>
                             
                             <div class="max-w-3xl mx-auto space-y-10">
-                                <!-- Bathrooms / Sanitaires -->
-                                <div class="flex items-center justify-between border-b border-gray-100 pb-6">
-                                    <div>
-                                        <span class="block text-lg font-serif" id="bath-label">Salles de bain</span>
-                                        <span class="text-xs text-gray-400" id="bath-sublabel">Points d'eau complets</span>
-                                    </div>
-                                    <div class="flex items-center space-x-4">
-                                        <button id="bath-minus" class="w-8 h-8 rounded-full border border-gray-300 hover:border-black flex items-center justify-center transition-colors">-</button>
-                                        <span id="bath-count" class="font-serif text-xl w-6 text-center">1</span>
-                                        <button id="bath-plus" class="w-8 h-8 rounded-full border border-gray-300 hover:border-black flex items-center justify-center transition-colors">+</button>
-                                    </div>
-                                </div>
-
                                 <!-- Finish Level -->
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <label class="cursor-pointer group">
@@ -886,8 +919,10 @@ basePrice: {
             floors: 1,
             basement: false,
             baths: 1,
+            bedrooms: 2,
             finish: 'standard',
             options: [],
+            renoDwelling: null,
             ownership: null,
             timeline: null
         };
@@ -906,11 +941,18 @@ basePrice: {
         const bathCount = document.getElementById('bath-count');
         const bathLabel = document.getElementById('bath-label');
         const bathSub = document.getElementById('bath-sublabel');
+        const bedroomCount = document.getElementById('bedroom-count');
+        const bedroomLabel = document.getElementById('bedroom-label');
+        const bedroomSub = document.getElementById('bedroom-sublabel');
         const progressBar = document.getElementById('progress-bar');
         const newConstructionFields = document.getElementById('new-construction-fields');
         const residentialOptions = document.getElementById('residential-options');
         const residentialExtras = document.getElementById('residential-extras');
         const tertiaryOptions = document.getElementById('tertiary-options');
+        const renoDwellingFields = document.getElementById('reno-dwelling-fields');
+        const renoDwellingError = document.getElementById('reno-dwelling-error');
+        const bathroomFields = document.getElementById('bathroom-fields');
+        const bedroomFields = document.getElementById('bedroom-fields');
         let currentStep = 1;
 
         // --- UI FUNCTIONS ---
@@ -952,6 +994,12 @@ basePrice: {
             });
         }
 
+        function refreshRenoDwellingUI() {
+            document.querySelectorAll('.reno-option').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.value === state.renoDwelling);
+            });
+        }
+
         // Type Selection
         
         
@@ -980,16 +1028,22 @@ basePrice: {
             if (type === 'tertiary') {
                 bathLabel.textContent = 'Nombre de sanitaires';
                 bathSub.textContent = '(WC / points d’eau)';
+                bedroomLabel.textContent = 'Espaces';
+                bedroomSub.textContent = '(bureaux / zones)';
             } else {
                 bathLabel.textContent = 'Nombre de salles de bain';
                 bathSub.textContent = '(hors WC séparés)';
+                bedroomLabel.textContent = 'Chambres';
+                bedroomSub.textContent = '(hors pièces annexes)';
             }
 
             // Reset fields that depend on project type
             state.ownership = null;
             state.timeline = null;
+            state.renoDwelling = null;
             refreshOwnershipUI();
             refreshTimelineUI();
+            refreshRenoDwellingUI();
 
             // Move forward only if user is still on step 1
             if (currentStep === 1) {
@@ -1042,6 +1096,14 @@ basePrice: {
             }
         }
 
+        function updateBedrooms(delta) {
+            const newVal = state.bedrooms + delta;
+            if(newVal >= 0 && newVal <= 12) {
+                state.bedrooms = newVal;
+                bedroomCount.textContent = newVal;
+            }
+        }
+
         // Finish Selection
         function selectFinish(finishType) {
             state.finish = finishType;
@@ -1069,6 +1131,21 @@ basePrice: {
                     newConstructionFields.classList.add('hidden');
                 } else {
                     newConstructionFields.classList.remove('hidden');
+                }
+
+                if (state.type === 'reno') {
+                    renoDwellingFields.classList.remove('hidden');
+                } else {
+                    renoDwellingFields.classList.add('hidden');
+                    if (renoDwellingError) renoDwellingError.classList.add('hidden');
+                }
+
+                if (state.type === 'tertiary') {
+                    bathroomFields.classList.add('hidden');
+                    bedroomFields.classList.add('hidden');
+                } else {
+                    bathroomFields.classList.remove('hidden');
+                    bedroomFields.classList.remove('hidden');
                 }
             }
 
@@ -1188,7 +1265,11 @@ const qErr = document.getElementById('step5-error');
                 selectedOptions.push(label);
             });
 
-            const finalTotal = totalWithFinish + optionsCost;
+            let finalTotal = totalWithFinish + optionsCost;
+
+            if (state.type === 'reno' && state.renoDwelling === 'apartment') {
+                finalTotal = finalTotal * 1.05;
+            }
 
             
             // Store the latest estimate for email sending
@@ -1199,8 +1280,10 @@ const qErr = document.getElementById('step5-error');
                 floors: state.floors,
                 basement: state.basement,
                 baths: state.baths,
+                bedrooms: state.bedrooms,
                 finish: state.finish,
                 options: selectedOptions,
+                renoDwelling: state.renoDwelling,
                 ownership: state.ownership,
                 timeline: state.timeline,
                 createdAt: new Date().toISOString()
@@ -1230,7 +1313,7 @@ const qErr = document.getElementById('step5-error');
             const timelineLabels = { lt1: "< 1 mois", "1to3": "1 à 3 mois", gt3: "> 3 mois" };
 
             const ownLabelEl = document.getElementById('res-ownership-label');
-            if (ownLabelEl) ownLabelEl.textContent = ownershipLabels[state.type] || "Bien / terrain";
+            if (ownLabelEl) ownEl.textContent = ownershipLabels[state.type] || "Bien / terrain";
 
             const ownEl = document.getElementById('res-ownership');
             if (ownEl) ownEl.textContent = state.ownership === 'yes' ? "Oui" : "Non";
@@ -1257,8 +1340,10 @@ const qErr = document.getElementById('step5-error');
                 floors: 1,
                 basement: false,
                 baths: 1,
+                bedrooms: 2,
                 finish: 'standard',
                 options: [],
+                renoDwelling: null,
                 ownership: null,
                 timeline: null
             };
@@ -1269,6 +1354,7 @@ const qErr = document.getElementById('step5-error');
             setFloors(1);
             updateBasement(false);
             bathCount.textContent = 1;
+            bedroomCount.textContent = 2;
             
             // Reset type selection
             document.querySelectorAll('.project-type-option').forEach(option => {
@@ -1290,6 +1376,8 @@ const qErr = document.getElementById('step5-error');
                 c.checked = false;
                 c.nextElementSibling.classList.remove('selected');
             });
+
+            refreshRenoDwellingUI();
             
             // Reset labels
             bathLabel.textContent = "Salles de bain";
@@ -1342,7 +1430,13 @@ const bindClick = (id, fn) => {
 
 
 // Step 2 -> Step 3
-bindClick('next-step-2', () => nextStep(3));
+bindClick('next-step-2', () => {
+    if (state.type === 'reno' && !state.renoDwelling) {
+        if (renoDwellingError) renoDwellingError.classList.remove('hidden');
+        return;
+    }
+    nextStep(3);
+});
 bindClick('prev-step-2', () => prevStep(1));
 
 // Header / hero CTAs
@@ -1356,6 +1450,24 @@ bindClick('prev-step-3', () => prevStep(2));
 // Step 4 -> Step 5
 bindClick('calculate-btn', () => nextStep(5));
 bindClick('prev-step-4', () => prevStep(3));
+
+// Bath + bedroom counters
+bindClick('bath-minus', () => updateBath(-1));
+bindClick('bath-plus', () => updateBath(1));
+bindClick('bedroom-minus', () => updateBedrooms(-1));
+bindClick('bedroom-plus', () => updateBedrooms(1));
+
+// Reno dwelling selection
+(() => {
+    document.querySelectorAll('.reno-option').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            state.renoDwelling = btn.dataset.value || null;
+            if (renoDwellingError) renoDwellingError.classList.add('hidden');
+            refreshRenoDwellingUI();
+        });
+    });
+})();
 
 // Finish selection cards
 (() => {
